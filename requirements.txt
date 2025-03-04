@@ -1,0 +1,4 @@
+streamlit
+requests
+nltk
+PyPDF2
