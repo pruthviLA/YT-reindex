@@ -49,9 +49,6 @@ else:
     transcript_text = st.text_area("Or paste transcript text here:", height=200)
 
 if transcript_text:
-    st.markdown("#### Transcript Preview:")
-    st.write(transcript_text[:1000] + "..." if len(transcript_text) > 1000 else transcript_text)
-
     st.markdown("### Extracting & Sorting Keywords")
     # Tokenize the transcript and filter out punctuation and stopwords
     tokens = word_tokenize(transcript_text.lower())
