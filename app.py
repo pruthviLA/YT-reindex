@@ -9,14 +9,22 @@ from collections import Counter
 from io import StringIO, BytesIO
 import PyPDF2
 
-# Download NLTK resources (only needed the first time)
-nltk.download('punkt')
-nltk.download('stopwords')
+# Ensure NLTK data is available
+try:
+    nltk.data.find("tokenizers/punkt")
+except LookupError:
+    nltk.download("punkt", quiet=True)
+
+try:
+    nltk.data.find("corpora/stopwords")
+except LookupError:
+    nltk.download("stopwords", quiet=True)
+
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
 # Load API key from Streamlit secrets
-# Create a file called .streamlit/secrets.toml (or use Streamlit Cloud secrets) with your key:
+# Make sure you have a .streamlit/secrets.toml file with your API key:
 # [api_keys]
 # GOOGLE_NEWS_API_KEY = "your-google-news-api-key"
 GOOGLE_NEWS_API_KEY = st.secrets["api_keys"]["GOOGLE_NEWS_API_KEY"]
