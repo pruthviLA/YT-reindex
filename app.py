@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import requests
 import json
@@ -6,27 +7,32 @@ import datetime
 import nltk
 import string
 from collections import Counter
-from io import StringIO, BytesIO
+from io import BytesIO
 import PyPDF2
 
-# Ensure NLTK data is available
-try:
-    nltk.data.find("tokenizers/punkt")
-except LookupError:
-    nltk.download("punkt", quiet=True)
+# -------------------------------------------------
+# Set up a local NLTK data directory and ensure required resources are available
+# -------------------------------------------------
+nltk_data_dir = "./nltk_data"
+if not os.path.exists(nltk_data_dir):
+    os.makedirs(nltk_data_dir)
+os.environ["NLTK_DATA"] = nltk_data_dir
+if nltk_data_dir not in nltk.data.path:
+    nltk.data.path.append(nltk_data_dir)
 
-try:
-    nltk.data.find("corpora/stopwords")
-except LookupError:
-    nltk.download("stopwords", quiet=True)
+# Force download required NLTK packages into the local directory
+nltk.download("punkt", quiet=True, download_dir=nltk_data_dir)
+nltk.download("stopwords", quiet=True, download_dir=nltk_data_dir)
 
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
+# -------------------------------------------------
 # Load API key from Streamlit secrets
-# Make sure you have a .streamlit/secrets.toml file with your API key:
+# Make sure you have a .streamlit/secrets.toml file with:
 # [api_keys]
 # GOOGLE_NEWS_API_KEY = "your-google-news-api-key"
+# -------------------------------------------------
 GOOGLE_NEWS_API_KEY = st.secrets["api_keys"]["GOOGLE_NEWS_API_KEY"]
 
 st.title("News Keyword Explorer & Modern News Cards")
@@ -75,7 +81,10 @@ if transcript_text:
         
         # For each keyword, query the Google News API
         for keyword in selected_keywords:
-            url = f"https://newsapi.org/v2/everything?q={keyword}&from={from_date}&sortBy=publishedAt&apiKey={GOOGLE_NEWS_API_KEY}"
+            url = (
+                f"https://newsapi.org/v2/everything?q={keyword}&from={from_date}"
+                f"&sortBy=publishedAt&apiKey={GOOGLE_NEWS_API_KEY}"
+            )
             response = requests.get(url)
             data = response.json()
             if data.get("status") == "ok":
@@ -85,7 +94,7 @@ if transcript_text:
                 all_news[keyword] = []
         
         st.markdown("### News Results")
-        # Display results for each keyword
+        # Display results for each keyword as modern cards
         for keyword, articles in all_news.items():
             st.markdown(f"#### News for keyword: **{keyword}**")
             if articles:
