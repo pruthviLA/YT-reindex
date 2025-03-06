@@ -1,5 +1,6 @@
 streamlit
+requests
 openai
+spacy
+youtube-transcript-api
 PyPDF2
-pytube
-GoogleNews
